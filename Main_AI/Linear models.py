@@ -1,6 +1,3 @@
-import math
-
-
 data = [
     (0, 12),
     (2, 15),
@@ -31,20 +28,47 @@ data = [
     (47, 148),
     (50, 160)
 ]
-M=1
-C=1
-def loss(y_pred):
-    Total=0
-    count=0
-    for point in data:
-        y=point[1]
-        total+=(y_pred[count]-y)**2
-        count+=1
-    loss=total/len(data)
-    return loss
-
-def f(X):
-    return M*X+C
-
-
-
+class Model:
+    def __init__(self, data, m, c, lr):
+        self.data = data
+        self.m = m
+        self.c = c
+        self.lr = lr
+    def loss(self, y_pred):
+        total=0
+        count=0
+        for point in self.data:
+            y=point[1]
+            total+=(y_pred[count]-y)**2
+            count+=1
+        loss=total/count
+        return loss
+    def f(self, X):
+        return self.m*X+self.c
+    def grad_m(self):
+        error=0
+        for point in self.data:
+            error+=2*point[0]*(self.f(point[0])-point[1])
+        return error/len(data)
+    def grad_c(self):
+        error=0
+        for point in self.data:
+            error+=2*(self.f(point[0])-point[1])
+        return error/len(self.data)
+    def train(self):
+        y_pred=[]
+        for point in self.data:
+            y_pred.append(self.f(point[0]))
+        for i in range(100000):
+            y_pred=[]
+            for point in self.data:
+                y_pred.append(self.f(point[0]))
+            self.m-=self.lr*self.grad_m()
+            self.c-=self.lr*self.grad_c()
+            print(self.loss(y_pred))
+    def result(self):
+        print(f"The Line is {self.m}X+{self.c}")
+        print(f"The Average loss is:{self.loss}")
+m1=Model(data,1,1,0.00005)
+m1.train()
+m1.result()
